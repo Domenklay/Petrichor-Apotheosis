@@ -1,0 +1,42 @@
+name: Build Petrichor Apotheosis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore src/PetrichorApotheosis/PetrichorApotheosis.csproj
+
+      - name: Build
+        run: dotnet build src/PetrichorApotheosis/PetrichorApotheosis.csproj -c Release --no-restore
+
+      - name: Package
+        shell: bash
+        run: |
+          mkdir -p package/PetrichorApotheosis
+          cp src/PetrichorApotheosis/bin/Release/netstandard2.1/PetrichorApotheosis.dll package/PetrichorApotheosis/
+          cp src/PetrichorApotheosis/manifest.json package/PetrichorApotheosis/
+          cp "$HOME/.nuget/packages/newtonsoft.json/12.0.3/lib/net45/Newtonsoft.Json.dll" package/PetrichorApotheosis/
+          cd package
+          zip -r ../PetrichorApotheosis-0.8.0.zip PetrichorApotheosis
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PetrichorApotheosis-0.8.0
+          path: |
+            PetrichorApotheosis-0.8.0.zip
+            package/PetrichorApotheosis/PetrichorApotheosis.dll
+            package/PetrichorApotheosis/Newtonsoft.Json.dll
+          if-no-files-found: error
