@@ -1,0 +1,61 @@
+using BepInEx;
+using BepInEx.Configuration;
+using BepInEx.Logging;
+using PetrichorLegacy.Networking;
+using PetrichorLegacy.Persistence;
+using PetrichorLegacy.Progression;
+using PetrichorLegacy.UI;
+using UnityEngine;
+
+namespace PetrichorLegacy
+{
+    [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+    public sealed class PetrichorApotheosisPlugin : BaseUnityPlugin
+    {
+        public const string PluginGuid = "com.petrichorlegacy.metaprogression";
+        public const string PluginName = "Petrichor: Apotheosis";
+        public const string PluginVersion = "0.8.0";
+
+        public static PetrichorApotheosisPlugin Instance { get; private set; }
+        public static ManualLogSource Log { get; private set; }
+
+        private MetaProgressionUIV5 _ui;
+        private MonsterRarityOverlay _enemyOverlay;
+        private ConfigEntry<KeyboardShortcut> _toggleKey;
+
+        private void Awake()
+        {
+            Instance = this;
+            Log = Logger;
+            _toggleKey = Config.Bind("UI", "ToggleKey", new KeyboardShortcut(KeyCode.M), "Open meta progression UI.");
+
+            ProgressionNetwork.Register();
+            RunTracker.Install();
+            TalentEffects.Install();
+            AdditionalSpecEffects.Install();
+            CapstoneRewardSystem.Install();
+            PerfectionRuntimeEffects.Install();
+            MonsterRaritySystem.Install();
+            MonsterTraitSystem.Install();
+
+            _ui = gameObject.AddComponent<MetaProgressionUIV5>();
+            _ui.Configure(_toggleKey);
+            _enemyOverlay = gameObject.AddComponent<MonsterRarityOverlay>();
+
+            SaveService.RefreshProfile();
+            Logger.LogInfo($"{PluginName} Infinite Progression {PluginVersion} loaded. Press M to open the progression window.");
+        }
+
+        private void OnDestroy()
+        {
+            SaveService.SaveCurrent();
+            MonsterTraitSystem.Uninstall();
+            MonsterRaritySystem.Uninstall();
+            PerfectionRuntimeEffects.Uninstall();
+            CapstoneRewardSystem.Uninstall();
+            AdditionalSpecEffects.Uninstall();
+            RunTracker.Uninstall();
+            TalentEffects.Uninstall();
+        }
+    }
+}
