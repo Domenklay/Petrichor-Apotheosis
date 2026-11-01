@@ -17,20 +17,137 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Materialize clean source tree
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Materialize Petrichor Legacy 0.7.1 source
         shell: bash
         run: |
-          rm -rf /tmp/apotheosis-bootstrap
-          mkdir -p /tmp/apotheosis-bootstrap
-          unzip -q bootstrap-source.zip -d /tmp/apotheosis-bootstrap
-          cp -a /tmp/apotheosis-bootstrap/. .
+          rm -rf /tmp/forai
+          git clone --depth 1 --branch build/petrichorlegacy-0.7.1-mastery-prestige https://github.com/Domenklay/ForAi.git /tmp/forai
+          cd /tmp/forai
+          python3 tools/patch_petrichorlegacy_041.py
+          python3 tools/patch_petrichorlegacy_050.py
+          python3 tools/patch_petrichorlegacy_051.py
+          python3 tools/patch_petrichorlegacy_060.py
+          python3 tools/patch_petrichorlegacy_061.py
+          python3 tools/patch_petrichorlegacy_062.py
+          python3 tools/patch_petrichorlegacy_063.py
+          python3 tools/patch_petrichorlegacy_070_compat.py
+          python3 tools/patch_petrichorlegacy_070.py
+          python3 tools/patch_petrichorlegacy_071.py
+
+      - name: Rebrand and copy clean source
+        shell: bash
+        run: |
+          rm -rf src
+          mkdir -p src/PetrichorApotheosis
+          cp -a /tmp/forai/PetrichorLegacy/. src/PetrichorApotheosis/
+          rm -rf src/PetrichorApotheosis/bin src/PetrichorApotheosis/obj
+          rm -f src/PetrichorApotheosis/UI/MetaProgressionUI.cs
+          rm -f src/PetrichorApotheosis/UI/MetaProgressionUIV2.cs
+          rm -f src/PetrichorApotheosis/UI/MetaProgressionUIV3.cs
+          rm -f src/PetrichorApotheosis/UI/MetaProgressionUIV4.cs
+          rm -f src/PetrichorApotheosis/UI/README-0.3.2.txt src/PetrichorApotheosis/UI/README-0.4.0.txt
+          mv src/PetrichorApotheosis/PetrichorLegacy.csproj src/PetrichorApotheosis/PetrichorApotheosis.csproj
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root = Path('src/PetrichorApotheosis')
+          for p in root.rglob('*.cs'):
+              t = p.read_text(encoding='utf-8')
+              t = t.replace('PetrichorLegacyPlugin', 'PetrichorApotheosisPlugin')
+              t = t.replace('PETRICHOR LEGACY — META PROGRESSION', 'PETRICHOR: APOTHEOSIS — META PROGRESSION')
+              t = t.replace('PetrichorLegacy_UnstableBlast', 'PetrichorApotheosis_UnstableBlast')
+              p.write_text(t, encoding='utf-8')
+          p = root / 'Plugin.cs'
+          t = p.read_text(encoding='utf-8')
+          t = t.replace('public sealed class PetrichorApotheosisPlugin : BaseUnityPlugin', 'public sealed class PetrichorApotheosisPlugin : BaseUnityPlugin')
+          t = t.replace('public const string PluginName = "Petrichor Legacy";', 'public const string PluginName = "Petrichor: Apotheosis";')
+          t = t.replace('public const string PluginVersion = "0.7.1";', 'public const string PluginVersion = "0.8.0";')
+          p.write_text(t, encoding='utf-8')
+          p = root / 'Persistence' / 'SaveService.cs'
+          t = p.read_text(encoding='utf-8')
+          t = t.replace('private static string SaveDirectory => System.IO.Path.Combine(Paths.ConfigPath, "PetrichorLegacy");', '// Kept intentionally for compatibility with Petrichor Legacy 0.7.x saves.\n        private static string SaveDirectory => System.IO.Path.Combine(Paths.ConfigPath, "PetrichorLegacy");')
+          p.write_text(t, encoding='utf-8')
+          p = root / 'PetrichorApotheosis.csproj'
+          t = p.read_text(encoding='utf-8')
+          t = t.replace('<AssemblyName>PetrichorLegacy</AssemblyName>', '<AssemblyName>PetrichorApotheosis</AssemblyName>')
+          t = t.replace('<Version>0.7.1</Version>', '<Version>0.8.0</Version>')
+          p.write_text(t, encoding='utf-8')
+          manifest = {
+              'name': 'PetrichorApotheosis',
+              'version_number': '0.8.0',
+              'website_url': 'https://github.com/Domenklay/Petrichor-Apotheosis',
+              'description': 'Persistent meta progression for Risk of Rain 2: seven classes, 21 specializations, Arsenal, Mastery, Perfection, infinite Prestige, and mechanically enhanced special monsters.',
+              'dependencies': []
+          }
+          (root / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+
+      - name: Create clean build workflow and ignore file
+        shell: bash
+        run: |
+          mkdir -p .github/workflows
+          cat > .github/workflows/build.yml <<'EOF'
+          name: Build Petrichor Apotheosis
+
+          on:
+            push:
+              branches: [ main ]
+            pull_request:
+              branches: [ main ]
+            workflow_dispatch:
+
+          jobs:
+            build:
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: actions/setup-dotnet@v4
+                  with:
+                    dotnet-version: '8.0.x'
+                - name: Restore
+                  run: dotnet restore src/PetrichorApotheosis/PetrichorApotheosis.csproj
+                - name: Build
+                  run: dotnet build src/PetrichorApotheosis/PetrichorApotheosis.csproj -c Release --no-restore
+                - name: Package
+                  shell: bash
+                  run: |
+                    mkdir -p package/PetrichorApotheosis
+                    cp src/PetrichorApotheosis/bin/Release/netstandard2.1/PetrichorApotheosis.dll package/PetrichorApotheosis/
+                    cp src/PetrichorApotheosis/manifest.json package/PetrichorApotheosis/
+                    cp "$HOME/.nuget/packages/newtonsoft.json/12.0.3/lib/net45/Newtonsoft.Json.dll" package/PetrichorApotheosis/
+                    cd package
+                    zip -r ../PetrichorApotheosis-0.8.0.zip PetrichorApotheosis
+                - uses: actions/upload-artifact@v4
+                  with:
+                    name: PetrichorApotheosis-0.8.0
+                    path: |
+                      PetrichorApotheosis-0.8.0.zip
+                      package/PetrichorApotheosis/PetrichorApotheosis.dll
+                      package/PetrichorApotheosis/Newtonsoft.Json.dll
+                    if-no-files-found: error
+          EOF
+          cat > .gitignore <<'EOF'
+          bin/
+          obj/
+          .vs/
+          .idea/
+          *.user
+          *.suo
+          *.zip
+          *.dll
+          .DS_Store
+          EOF
           rm -f bootstrap-source.zip .github/workflows/bootstrap.yml
 
-      - name: Commit materialized repository
+      - name: Commit clean repository
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "Materialize Petrichor: Apotheosis 0.8.0 source [skip ci] [skip bootstrap]"
+          git commit -m "Materialize Petrichor: Apotheosis 0.8.0 source [skip bootstrap]"
           git push origin HEAD:main
