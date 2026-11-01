@@ -191,7 +191,7 @@ namespace PetrichorLegacy.UI
             }
 
             var viewport = new Rect(area.x, area.y + 38f, area.width, area.height - 38f);
-            const float contentHeight = 1745f;
+            const float contentHeight = 1595f;
             _treeScroll = GUI.BeginScrollView(viewport, _treeScroll, new Rect(0f, 0f, viewport.width - 18f, Mathf.Max(contentHeight, viewport.height - 2f)));
             var w = viewport.width - 28f;
 
@@ -208,15 +208,15 @@ namespace PetrichorLegacy.UI
             var gap = 12f;
             var colW = (w - 24f - gap * 2f) / 3f;
             var pathsY = 230f;
-            var pathH = 960f;
+            var pathH = 810f;
 
             var combatPanel = new Rect(6f, pathsY, colW, pathH);
             var survivalPanel = new Rect(6f + colW + gap, pathsY, colW, pathH);
             var mobilityPanel = new Rect(6f + (colW + gap) * 2f, pathsY, colW, pathH);
 
-            DrawLegacyPathPanel(p, combatPanel, "НАТИСК", "combat", chosen, new[] { "legacy_damage", "legacy_attack", "legacy_hunter", "legacy_precision", "legacy_finisher", "legacy_momentum" });
-            DrawLegacyPathPanel(p, survivalPanel, "СТОЙКОСТЬ", "survival", chosen, new[] { "legacy_hp", "legacy_regen", "legacy_armor", "legacy_recovery", "legacy_resolve", "legacy_secondwind" });
-            DrawLegacyPathPanel(p, mobilityPanel, "МАНЁВР", "mobility", chosen, new[] { "legacy_move", "legacy_sprint", "legacy_jump", "legacy_evasion", "legacy_stride", "legacy_aircontrol" });
+            DrawLegacyPathPanel(p, combatPanel, "НАТИСК", "combat", chosen, new[] { "legacy_damage", "legacy_attack", "legacy_hunter", "legacy_precision", "legacy_finisher" });
+            DrawLegacyPathPanel(p, survivalPanel, "СТОЙКОСТЬ", "survival", chosen, new[] { "legacy_hp", "legacy_regen", "legacy_armor", "legacy_resolve", "legacy_secondwind" });
+            DrawLegacyPathPanel(p, mobilityPanel, "МАНЁВР", "mobility", chosen, new[] { "legacy_move", "legacy_sprint", "legacy_jump", "legacy_stride", "legacy_aircontrol" });
 
             if (first != null)
             {
@@ -230,7 +230,7 @@ namespace PetrichorLegacy.UI
                 FillRect(new Rect(mobilityPanel.center.x - 1f, stemY, 2f, pathsY - stemY), lineColor);
             }
 
-            var sharedHeader = new Rect(w * 0.5f - 210f, 1215f, 420f, 30f);
+            var sharedHeader = new Rect(w * 0.5f - 210f, 1065f, 420f, 30f);
             FillRect(sharedHeader, new Color(0.032f, 0.043f, 0.050f, 1f));
             DrawBorder(sharedHeader, new Color(0.16f, 0.30f, 0.36f, 1f), 1f);
             GUI.Label(sharedHeader, "СНАРЯЖЕНИЕ И ОПЫТ", _center);
@@ -238,10 +238,10 @@ namespace PetrichorLegacy.UI
             var pack2 = TalentCatalog.Find("legacy_pack2");
             var gold = TalentCatalog.Find("legacy_startgold");
             var sharedW = Mathf.Min(440f, w * 0.42f);
-            var packRect = new Rect(w * 0.5f - sharedW * 0.5f, 1260f, sharedW, 140f);
-            var goldRect = new Rect(w * 0.5f - sharedW * 0.5f, 1417f, sharedW, 140f);
+            var packRect = new Rect(w * 0.5f - sharedW * 0.5f, 1110f, sharedW, 140f);
+            var goldRect = new Rect(w * 0.5f - sharedW * 0.5f, 1267f, sharedW, 140f);
             var fieldcraft = TalentCatalog.Find("legacy_fieldcraft");
-            var fieldRect = new Rect(w * 0.5f - sharedW * 0.5f, 1574f, sharedW, 140f);
+            var fieldRect = new Rect(w * 0.5f - sharedW * 0.5f, 1424f, sharedW, 140f);
             if (pack2 != null) DrawTalentNode(p, pack2, packRect);
             if (gold != null) DrawTalentNode(p, gold, goldRect);
             if (fieldcraft != null) DrawTalentNode(p, fieldcraft, fieldRect);
@@ -456,17 +456,14 @@ namespace PetrichorLegacy.UI
             if (id == "legacy_hunter") return new[] { "BossDamageBonus" };
             if (id == "legacy_precision") return new[] { "CritGlasses" };
             if (id == "legacy_finisher") return new[] { "ExecuteLowHealthElite" };
-            if (id == "legacy_momentum") return new[] { "WarCryOnMultiKill" };
             if (id == "legacy_hp") return new[] { "Infusion" };
             if (id == "legacy_regen") return new[] { "HealWhileSafe" };
             if (id == "legacy_armor") return new[] { "ArmorPlate" };
-            if (id == "legacy_recovery") return new[] { "Medkit" };
             if (id == "legacy_resolve") return new[] { "Knurl" };
             if (id == "legacy_secondwind") return new[] { "BarrierOnKill" };
             if (id == "legacy_move") return new[] { "Hoof" };
             if (id == "legacy_sprint") return new[] { "SprintBonus" };
             if (id == "legacy_jump") return new[] { "Feather" };
-            if (id == "legacy_evasion") return new[] { "SprintOutOfCombat" };
             if (id == "legacy_stride") return new[] { "JumpBoost" };
             if (id == "legacy_aircontrol") return new[] { "SecondarySkillMagazine" };
             if (id == "legacy_pack2") return new[] { "EquipmentMagazine" };

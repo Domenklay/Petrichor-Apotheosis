@@ -74,31 +74,28 @@ namespace PetrichorLegacy.Progression
         public static readonly IReadOnlyList<TalentDef> All = new List<TalentDef>
         {
             // НАСЛЕДИЕ — десять покупок к моменту открытия первого класса.
-            new TalentDef("legacy_pack", "Первый трофей", "+1 вместимость стартового Арсенала. Базовая вместимость до этого равна 0.", TalentBranch.Legacy, 1, 1, 1, null, 0, 1, 0),
+            new TalentDef("legacy_pack", "Первый трофей", "+1 вместимость стартового Арсенала. Базовая вместимость до этого равна 0.", TalentBranch.Legacy, 1, 1, 2, null, 0, 1, 0),
 
             // НАТИСК
-            new TalentDef("legacy_damage", "Заточенное оружие", "+1.5% урона.", TalentBranch.Legacy, 1, 1, 2, "legacy_pack", 1, 0, 1),
-            new TalentDef("legacy_attack", "Быстрая рука", "+1.5% скорости атаки.", TalentBranch.Legacy, 1, 1, 3, "legacy_damage", 1, 0, 2),
-            new TalentDef("legacy_hunter", "Охотничий инстинкт", "+3% урона боссам и особым монстрам.", TalentBranch.Legacy, 1, 1, 4, "legacy_attack", 1, 0, 3),
-            new TalentDef("legacy_precision", "Точный расчёт", "+1% шанса критического удара.", TalentBranch.Legacy, 1, 1, 5, "legacy_hunter", 1, 0, 4),
-            new TalentDef("legacy_finisher", "Добивание", "+6% урона целям ниже 25% здоровья.", TalentBranch.Legacy, 1, 1, 6, "legacy_precision", 1, 0, 5),
-            new TalentDef("legacy_momentum", "Боевой темп", "+1% урона и +1% скорости движения.", TalentBranch.Legacy, 1, 1, 7, "legacy_finisher", 1, 0, 6),
+            new TalentDef("legacy_damage", "Заточенное оружие", "+1.5% урона.", TalentBranch.Legacy, 1, 1, 3, "legacy_pack", 1, 0, 1),
+            new TalentDef("legacy_attack", "Быстрая рука", "+1.5% скорости атаки.", TalentBranch.Legacy, 1, 1, 4, "legacy_damage", 1, 0, 2),
+            new TalentDef("legacy_hunter", "Охотничий инстинкт", "+3% урона боссам и особым монстрам.", TalentBranch.Legacy, 1, 1, 5, "legacy_attack", 1, 0, 3),
+            new TalentDef("legacy_precision", "Точный расчёт", "+1% шанса критического удара.", TalentBranch.Legacy, 1, 1, 6, "legacy_hunter", 1, 0, 4),
+            new TalentDef("legacy_finisher", "Добивание", "+6% урона целям ниже 25% здоровья и +1% скорости движения.", TalentBranch.Legacy, 1, 1, 7, "legacy_precision", 1, 0, 5),
 
             // СТОЙКОСТЬ
-            new TalentDef("legacy_hp", "Закалка", "+2% максимального здоровья.", TalentBranch.Legacy, 1, 1, 2, "legacy_pack", 1, 1, 1),
-            new TalentDef("legacy_regen", "Полевой рацион", "+4% естественной регенерации.", TalentBranch.Legacy, 1, 1, 3, "legacy_hp", 1, 1, 2),
-            new TalentDef("legacy_armor", "Крепкая кожа", "+2 брони.", TalentBranch.Legacy, 1, 1, 4, "legacy_regen", 1, 1, 3),
-            new TalentDef("legacy_recovery", "Запас сил", "+2% максимального здоровья.", TalentBranch.Legacy, 1, 1, 5, "legacy_armor", 1, 1, 4),
-            new TalentDef("legacy_resolve", "Упрямство", "Ниже 35% здоровья получаешь +3 брони.", TalentBranch.Legacy, 1, 1, 6, "legacy_recovery", 1, 1, 5),
-            new TalentDef("legacy_secondwind", "Резервный щит", "+3% максимального здоровья в виде щита.", TalentBranch.Legacy, 1, 1, 7, "legacy_resolve", 1, 1, 6),
+            new TalentDef("legacy_hp", "Закалка", "+2% максимального здоровья.", TalentBranch.Legacy, 1, 1, 3, "legacy_pack", 1, 1, 1),
+            new TalentDef("legacy_regen", "Полевой рацион", "+4% естественной регенерации.", TalentBranch.Legacy, 1, 1, 4, "legacy_hp", 1, 1, 2),
+            new TalentDef("legacy_armor", "Крепкая кожа", "+2 брони.", TalentBranch.Legacy, 1, 1, 5, "legacy_regen", 1, 1, 3),
+            new TalentDef("legacy_resolve", "Упрямство", "Ниже 35% здоровья получаешь +3 брони.", TalentBranch.Legacy, 1, 1, 6, "legacy_armor", 1, 1, 4),
+            new TalentDef("legacy_secondwind", "Резервный щит", "+3% максимального здоровья в виде щита.", TalentBranch.Legacy, 1, 1, 7, "legacy_resolve", 1, 1, 5),
 
             // МАНЁВР
-            new TalentDef("legacy_move", "Лёгкая поступь", "+2% скорости движения.", TalentBranch.Legacy, 1, 1, 2, "legacy_pack", 1, 2, 1),
-            new TalentDef("legacy_sprint", "Марш-бросок", "+3% скорости спринта.", TalentBranch.Legacy, 1, 1, 3, "legacy_move", 1, 2, 2),
-            new TalentDef("legacy_jump", "Лёгкое снаряжение", "+8% силы прыжка.", TalentBranch.Legacy, 1, 1, 4, "legacy_sprint", 1, 2, 3),
-            new TalentDef("legacy_evasion", "Смена позиции", "+1.5% скорости движения.", TalentBranch.Legacy, 1, 1, 5, "legacy_jump", 1, 2, 4),
-            new TalentDef("legacy_stride", "Длинный шаг", "Ещё +2% скорости спринта.", TalentBranch.Legacy, 1, 1, 6, "legacy_evasion", 1, 2, 5),
-            new TalentDef("legacy_aircontrol", "Чувство дистанции", "+5% силы прыжка.", TalentBranch.Legacy, 1, 1, 7, "legacy_stride", 1, 2, 6),
+            new TalentDef("legacy_move", "Лёгкая поступь", "+2% скорости движения.", TalentBranch.Legacy, 1, 1, 3, "legacy_pack", 1, 2, 1),
+            new TalentDef("legacy_sprint", "Марш-бросок", "+3% скорости спринта.", TalentBranch.Legacy, 1, 1, 4, "legacy_move", 1, 2, 2),
+            new TalentDef("legacy_jump", "Лёгкое снаряжение", "+8% силы прыжка.", TalentBranch.Legacy, 1, 1, 5, "legacy_sprint", 1, 2, 3),
+            new TalentDef("legacy_stride", "Длинный шаг", "Ещё +2% скорости спринта.", TalentBranch.Legacy, 1, 1, 6, "legacy_jump", 1, 2, 4),
+            new TalentDef("legacy_aircontrol", "Чувство дистанции", "+5% силы прыжка и +1.5% скорости движения.", TalentBranch.Legacy, 1, 1, 7, "legacy_stride", 1, 2, 5),
 
             // Общая концовка: уровни 8-10.
             new TalentDef("legacy_pack2", "Экспедиционный ранец", "+1 вместимость стартового Арсенала.", TalentBranch.Legacy, 1, 1, 8, "legacy_pack", 1, 1, 7),
