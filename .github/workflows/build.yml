@@ -30,13 +30,13 @@ jobs:
           cp src/PetrichorApotheosis/manifest.json package/PetrichorApotheosis/
           cp "$HOME/.nuget/packages/newtonsoft.json/12.0.3/lib/net45/Newtonsoft.Json.dll" package/PetrichorApotheosis/
           cd package
-          zip -r ../PetrichorApotheosis-0.8.0.zip PetrichorApotheosis
+          zip -r ../PetrichorApotheosis-0.8.1.zip PetrichorApotheosis
 
       - uses: actions/upload-artifact@v4
         with:
-          name: PetrichorApotheosis-0.8.0
+          name: PetrichorApotheosis-0.8.1
           path: |
-            PetrichorApotheosis-0.8.0.zip
+            PetrichorApotheosis-0.8.1.zip
             package/PetrichorApotheosis/PetrichorApotheosis.dll
             package/PetrichorApotheosis/Newtonsoft.Json.dll
           if-no-files-found: error

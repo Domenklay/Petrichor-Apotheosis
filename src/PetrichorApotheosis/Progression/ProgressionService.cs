@@ -54,8 +54,8 @@ namespace PetrichorLegacy.Progression
         public static int EarnedTalentPointsForLevel(int level)
         {
             level = Math.Max(1, level);
-            if (level <= 40) return level;
-            return 40 + (level - 40) / 2;
+            if (level <= 40) return Math.Max(0, level - 1);
+            return 39 + (level - 40) / 2;
         }
 
         public static int EarnedMasteryPointsForLevel(int level) => Math.Max(0, level - 40);
@@ -78,9 +78,9 @@ namespace PetrichorLegacy.Progression
                 error = "Это направление уже недоступно для текущего Наследия.";
                 return false;
             }
-            if (talentId == "legacy_pack2" && string.IsNullOrEmpty(chosenPath))
+            if (talentId == "legacy_pack2" && (string.IsNullOrEmpty(chosenPath) || !LegacyPathComplete(profile, chosenPath)))
             {
-                error = "Сначала продвинься дальше по Наследию.";
+                error = "Сначала заверши выбранное направление Наследия.";
                 return false;
             }
 
@@ -102,9 +102,9 @@ namespace PetrichorLegacy.Progression
         {
             switch (talentId)
             {
-                case "legacy_damage": case "legacy_attack": case "legacy_hunter": case "legacy_precision": case "legacy_finisher": case "legacy_momentum": return "combat";
-                case "legacy_hp": case "legacy_regen": case "legacy_armor": case "legacy_recovery": case "legacy_resolve": case "legacy_secondwind": return "survival";
-                case "legacy_move": case "legacy_sprint": case "legacy_jump": case "legacy_evasion": case "legacy_stride": case "legacy_aircontrol": return "mobility";
+                case "legacy_damage": case "legacy_attack": case "legacy_hunter": case "legacy_precision": case "legacy_finisher": return "combat";
+                case "legacy_hp": case "legacy_regen": case "legacy_armor": case "legacy_resolve": case "legacy_secondwind": return "survival";
+                case "legacy_move": case "legacy_sprint": case "legacy_jump": case "legacy_stride": case "legacy_aircontrol": return "mobility";
                 default: return string.Empty;
             }
         }
@@ -114,20 +114,29 @@ namespace PetrichorLegacy.Progression
             if (profile == null) return string.Empty;
             var ids = new[]
             {
-                "legacy_damage", "legacy_attack", "legacy_hunter", "legacy_precision", "legacy_finisher", "legacy_momentum",
-                "legacy_hp", "legacy_regen", "legacy_armor", "legacy_recovery", "legacy_resolve", "legacy_secondwind",
-                "legacy_move", "legacy_sprint", "legacy_jump", "legacy_evasion", "legacy_stride", "legacy_aircontrol"
+                "legacy_damage", "legacy_attack", "legacy_hunter", "legacy_precision", "legacy_finisher",
+                "legacy_hp", "legacy_regen", "legacy_armor", "legacy_resolve", "legacy_secondwind",
+                "legacy_move", "legacy_sprint", "legacy_jump", "legacy_stride", "legacy_aircontrol"
             };
             foreach (var id in ids)
                 if (TalentCatalog.GetRank(profile, id) > 0) return LegacyPathForTalent(id);
             return string.Empty;
         }
 
+        public static bool LegacyPathComplete(ProfileProgress profile, string path)
+        {
+            if (profile == null || string.IsNullOrEmpty(path)) return false;
+            if (string.Equals(path, "combat", StringComparison.OrdinalIgnoreCase)) return TalentCatalog.GetRank(profile, "legacy_finisher") > 0;
+            if (string.Equals(path, "survival", StringComparison.OrdinalIgnoreCase)) return TalentCatalog.GetRank(profile, "legacy_secondwind") > 0;
+            if (string.Equals(path, "mobility", StringComparison.OrdinalIgnoreCase)) return TalentCatalog.GetRank(profile, "legacy_aircontrol") > 0;
+            return false;
+        }
+
         public static bool CanBuyLegacyPathTalent(ProfileProgress profile, string talentId)
         {
             if (profile == null) return false;
             var chosen = LegacyPathChoice(profile);
-            if (talentId == "legacy_pack2") return !string.IsNullOrEmpty(chosen);
+            if (talentId == "legacy_pack2") return !string.IsNullOrEmpty(chosen) && LegacyPathComplete(profile, chosen);
             var path = LegacyPathForTalent(talentId);
             return string.IsNullOrEmpty(path) || string.IsNullOrEmpty(chosen) || string.Equals(path, chosen, StringComparison.OrdinalIgnoreCase);
         }

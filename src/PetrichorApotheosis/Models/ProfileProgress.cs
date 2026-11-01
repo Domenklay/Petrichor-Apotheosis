@@ -6,11 +6,11 @@ namespace PetrichorLegacy.Models
     [Serializable]
     public sealed class ProfileProgress
     {
-        public int schemaVersion = 7;
+        public int schemaVersion = 8;
         public int level = 1;
         public int currentXp = 0;
         public long lifetimeXp = 0;
-        public int unspentTalentPoints = 1;
+        public int unspentTalentPoints = 0;
         public int unspentMasteryPoints = 0;
         public int unspentPerfectionPoints = 0;
         public int runsCompleted = 0;

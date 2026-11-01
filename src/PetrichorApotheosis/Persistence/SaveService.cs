@@ -187,6 +187,28 @@ namespace PetrichorLegacy.Persistence
                 p.unspentPerfectionPoints += refund;
                 p.schemaVersion = 7;
             }
+
+            if (p.schemaVersion < 8)
+            {
+                // 0.8.1 removes the old free level-1 point and compresses each early Legacy route to five nodes.
+                // Removed nodes are refunded; existing legitimate purchases are never taken away.
+                var obsolete = new[] { "legacy_momentum", "legacy_recovery", "legacy_evasion" };
+                for (var i = p.talents.Count - 1; i >= 0; i--)
+                {
+                    var r = p.talents[i];
+                    if (r == null || Array.IndexOf(obsolete, r.id) < 0) continue;
+                    p.unspentTalentPoints += Math.Max(0, r.rank);
+                    p.talents.RemoveAt(i);
+                }
+                p.schemaVersion = 8;
+            }
+
+            // Self-heal lost talent currency from older builds/saves.
+            // Never subtracts grandfathered points: it only restores a deficit.
+            var expectedTalentPoints = ProgressionService.EarnedTalentPointsForLevel(p.level);
+            var accountedTalentPoints = TalentCatalog.GetSpentPoints(p) + p.unspentTalentPoints;
+            if (accountedTalentPoints < expectedTalentPoints)
+                p.unspentTalentPoints += expectedTalentPoints - accountedTalentPoints;
         }
 
         private static string Sanitize(string value)

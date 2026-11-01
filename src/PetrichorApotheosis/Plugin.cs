@@ -14,7 +14,7 @@ namespace PetrichorLegacy
     {
         public const string PluginGuid = "com.petrichorlegacy.metaprogression";
         public const string PluginName = "Petrichor: Apotheosis";
-        public const string PluginVersion = "0.8.0";
+        public const string PluginVersion = "0.8.1";
 
         public static PetrichorApotheosisPlugin Instance { get; private set; }
         public static ManualLogSource Log { get; private set; }
