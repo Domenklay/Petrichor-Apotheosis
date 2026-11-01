@@ -17,10 +17,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
       - name: Materialize Petrichor Legacy 0.7.1 source
         shell: bash
         run: |
@@ -63,7 +59,6 @@ jobs:
               p.write_text(t, encoding='utf-8')
           p = root / 'Plugin.cs'
           t = p.read_text(encoding='utf-8')
-          t = t.replace('public sealed class PetrichorApotheosisPlugin : BaseUnityPlugin', 'public sealed class PetrichorApotheosisPlugin : BaseUnityPlugin')
           t = t.replace('public const string PluginName = "Petrichor Legacy";', 'public const string PluginName = "Petrichor: Apotheosis";')
           t = t.replace('public const string PluginVersion = "0.7.1";', 'public const string PluginVersion = "0.8.0";')
           p.write_text(t, encoding='utf-8')
@@ -86,50 +81,9 @@ jobs:
           (root / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
 
-      - name: Create clean build workflow and ignore file
+      - name: Add repository ignore rules
         shell: bash
         run: |
-          mkdir -p .github/workflows
-          cat > .github/workflows/build.yml <<'EOF'
-          name: Build Petrichor Apotheosis
-
-          on:
-            push:
-              branches: [ main ]
-            pull_request:
-              branches: [ main ]
-            workflow_dispatch:
-
-          jobs:
-            build:
-              runs-on: ubuntu-latest
-              steps:
-                - uses: actions/checkout@v4
-                - uses: actions/setup-dotnet@v4
-                  with:
-                    dotnet-version: '8.0.x'
-                - name: Restore
-                  run: dotnet restore src/PetrichorApotheosis/PetrichorApotheosis.csproj
-                - name: Build
-                  run: dotnet build src/PetrichorApotheosis/PetrichorApotheosis.csproj -c Release --no-restore
-                - name: Package
-                  shell: bash
-                  run: |
-                    mkdir -p package/PetrichorApotheosis
-                    cp src/PetrichorApotheosis/bin/Release/netstandard2.1/PetrichorApotheosis.dll package/PetrichorApotheosis/
-                    cp src/PetrichorApotheosis/manifest.json package/PetrichorApotheosis/
-                    cp "$HOME/.nuget/packages/newtonsoft.json/12.0.3/lib/net45/Newtonsoft.Json.dll" package/PetrichorApotheosis/
-                    cd package
-                    zip -r ../PetrichorApotheosis-0.8.0.zip PetrichorApotheosis
-                - uses: actions/upload-artifact@v4
-                  with:
-                    name: PetrichorApotheosis-0.8.0
-                    path: |
-                      PetrichorApotheosis-0.8.0.zip
-                      package/PetrichorApotheosis/PetrichorApotheosis.dll
-                      package/PetrichorApotheosis/Newtonsoft.Json.dll
-                    if-no-files-found: error
-          EOF
           cat > .gitignore <<'EOF'
           bin/
           obj/
@@ -141,13 +95,13 @@ jobs:
           *.dll
           .DS_Store
           EOF
-          rm -f bootstrap-source.zip .github/workflows/bootstrap.yml
+          rm -f bootstrap-source.zip
 
-      - name: Commit clean repository
+      - name: Commit clean source
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
+          git add -A ':!.github/workflows'
           git commit -m "Materialize Petrichor: Apotheosis 0.8.0 source [skip bootstrap]"
           git push origin HEAD:main
